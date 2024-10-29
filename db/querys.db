@@ -1,0 +1,57 @@
+-- Primeiro, crie o esquema se ele não existir
+CREATE SCHEMA IF NOT EXISTS cashflow_financeiro;
+
+-- Criação das tabelas dimensão dentro do esquema cashflow_financeiro
+CREATE TABLE cashflow_financeiro.dim_fornecedor (
+    FornecedorID BIGINT PRIMARY KEY,
+    Nome_Fornec TEXT
+);
+
+CREATE TABLE cashflow_financeiro.dim_cliente (
+    ClienteID BIGINT PRIMARY KEY,
+    Nome_Cliente TEXT
+);
+
+CREATE TABLE cashflow_financeiro.dim_natureza (
+    NaturezaID BIGINT PRIMARY KEY,
+    Descricao TEXT
+);
+
+CREATE TABLE cashflow_financeiro.dim_loja (
+    LojaID BIGINT PRIMARY KEY,
+    Descricao TEXT
+);
+
+-- Criação das tabelas fato dentro do esquema cashflow_financeiro
+CREATE TABLE cashflow_financeiro.fato_apagar (
+    No_Titulo BIGINT,
+    Parcela DOUBLE PRECISION,
+    Tipo TEXT,
+    FornecedorID BIGINT,
+    Valor DOUBLE PRECISION,
+    Data_Emissao DATE,
+    Data_Vencimento DATE,
+    Data_Vencimento_Real DATE,
+    PRIMARY KEY (No_Titulo, Parcela),
+    FOREIGN KEY (FornecedorID) REFERENCES cashflow_financeiro.dim_fornecedor(FornecedorID)
+);
+
+CREATE TABLE cashflow_financeiro.fato_areceber (
+    No_Titulo BIGINT,
+    Parcela DOUBLE PRECISION,
+    Tipo TEXT,
+    NaturezaID BIGINT,
+    ClienteID BIGINT,
+    LojaID BIGINT,
+    Valor DOUBLE PRECISION,
+    Data_Emissao DATE,
+    Data_Vencimento DATE,
+    Data_Vencimento_Real DATE,
+    PRIMARY KEY (No_Titulo, Parcela),
+    FOREIGN KEY (NaturezaID) REFERENCES cashflow_financeiro.dim_natureza(NaturezaID),
+    FOREIGN KEY (ClienteID) REFERENCES cashflow_financeiro.dim_cliente(ClienteID),
+    FOREIGN KEY (LojaID) REFERENCES cashflow_financeiro.dim_loja(LojaID)
+);
+
+
+
