@@ -1,3 +1,13 @@
+import secrets
+
+# Gera uma chave de assinatura segura
+key = secrets.token_hex(16)
+print("Generated key:", key)
+
+
+
+
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -109,6 +119,7 @@ class FluxoDeCaixa:
         start_date = pd.to_datetime(start_date)
         end_date = pd.to_datetime(end_date)
 
+        # Ajustar e combinar DataFrames para gráficos
         self.df_pagar['Categoria'] = 'A Pagar'
         self.df_receber['Categoria'] = 'A Receber'
         df_combined = pd.concat([self.df_pagar, self.df_receber], ignore_index=True)
@@ -119,6 +130,7 @@ class FluxoDeCaixa:
         df_combined['Semana'] = df_combined['Data_Emissao'].dt.to_period('W').apply(lambda r: r.start_time)
         df_grouped = df_combined.groupby(['Semana', 'Categoria']).agg({'Vlr_Titulo': 'sum'}).reset_index()
 
+        # Gráfico de barras
         fig_barras = px.bar(
             df_grouped,
             x='Semana',
@@ -130,16 +142,8 @@ class FluxoDeCaixa:
             template='plotly_white'
         )
 
-        fig_linhas = px.line(
-            df_combined,
-            x='Data_Emissao',
-            y='Vlr_Titulo',
-            color='Categoria',
-            title="Fluxo Cumulativo de Caixa por Data de Emissão",
-            labels={'Vlr_Titulo': 'Valor (R$)', 'Data_Emissao': 'Data de Emissão'},
-            template='plotly_white'
-        )
 
+        # Gráfico de pizza
         fig_pizza = px.pie(
             df_combined,
             names='Categoria',
@@ -148,24 +152,10 @@ class FluxoDeCaixa:
             template='plotly_white'
         )
 
-        # Gráfico de faixas: diferença acumulada entre contas a pagar e a receber
-        df_combined['Saldo Acumulado'] = df_combined.apply(
-            lambda row: row['Vlr_Titulo'] if row['Categoria'] == 'A Receber' else -row['Vlr_Titulo'], axis=1
-        ).cumsum()
-
-        fig_faixa = px.area(
-            df_combined,
-            x='Data_Emissao',
-            y='Saldo Acumulado',
-            title="Evolução do Saldo Acumulado ao Longo do Tempo",
-            labels={'Saldo Acumulado': 'Saldo Acumulado (R$)', 'Data_Emissao': 'Data de Emissão'},
-            template='plotly_white'
-        )
-
+        # Exibição dos gráficos
         st.plotly_chart(fig_barras, use_container_width=True)
-        st.plotly_chart(fig_linhas, use_container_width=True)
         st.plotly_chart(fig_pizza, use_container_width=True)
-        st.plotly_chart(fig_faixa, use_container_width=True)
+        
 
 def main():
     st.set_page_config(page_title="Dashboard de Fluxo de Caixa", layout="wide")

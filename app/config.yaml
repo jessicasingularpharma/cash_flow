@@ -1,0 +1,17 @@
+cookie:
+  expiry_days: 30
+  key: 3db4eeb8c0c84db39dc66ec7e71d28b3
+  name: auth_session
+
+credentials:
+  usernames:
+    username1:
+      email: jessicahora@singularpharma.com.br
+      password: hashed_password1
+    username2:
+      email: carolinafernandes@singularpharma.com.br
+      password: hashed_password2
+
+pre-authorized:
+  emails:
+    - jessicahora1234@gmail.com
